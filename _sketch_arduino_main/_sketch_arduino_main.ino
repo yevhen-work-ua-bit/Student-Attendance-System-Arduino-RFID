@@ -1,14 +1,15 @@
 #include <Wire.h>
 #include <Adafruit_PN532.h>
 
+// connection SDA/SCL pin
 #define SDA_PIN A4
 #define SCL_PIN A5
 #define RELAY_PIN 7
 
 Adafruit_PN532 nfc(SDA_PIN, SCL_PIN);
 
-int ledPin = 2;       // Зеленый светодиод — готовность приложить карту
-int ledPinErr = 8;    // Красный светодиод — ошибка
+int ledPin = 2;       // Green led - ready
+int ledPinErr = 8;    // Red led - err
 
 bool isWriteMode = false;
 bool isKeyReady = false;
@@ -17,7 +18,7 @@ String tagID = "";
 
 uint8_t defaultKeyA[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-// Массив допустимых UID (записывать будем один из них случайно)
+// Array of valid UID`s (will write one of then randomly, you can to add a new UID if you want)
 String allowedUIDs[] = {
   "A1B2C3D4", "1A2B3C4D", "1234ABCD", "DEADBEEF"
 };
@@ -34,7 +35,7 @@ void setup() {
   digitalWrite(ledPin, LOW);
   digitalWrite(ledPinErr, LOW);
 
-  isWriteMode = false;
+  isWriteMode = false; //write mode is off
 
   nfc.begin();
   uint32_t versiondata = nfc.getFirmwareVersion();
@@ -97,17 +98,17 @@ void writeKeyAndUID() {
       uint8_t keyData[16] = {0};
       incomingKey.getBytes(keyData, 17); // 17 чтобы вместился \0
 
-      // Записываем ключ в блок 4
+      // Writing the key into block 4
       if (nfc.mifareclassic_WriteDataBlock(4, keyData)) {
         Serial.println("Key written.");
 
-        // Выбираем случайный UID из массива
+        // Select a random UID from the array
         int index = random(allowedCount);
         String randomUID = allowedUIDs[index];
         Serial.print("Selected UID to write: ");
         Serial.println(randomUID);
 
-        // Пишем UID в блок 5
+        // Writing the UID into block 5
         uint8_t uidData[16] = {0};
         randomUID.getBytes(uidData, 17);
 
@@ -134,13 +135,13 @@ void writeKeyAndUID() {
       delay(2000);
       digitalWrite(ledPinErr, LOW);
     }
-  // 🔥 ВОТ ДОБАВЛЯЕМ ЭТО:
   isWriteMode = false;
   Serial.println("Switched back to READ mode after writing.");
   }
   
 }
 
+// read key & UID mode
 void readKeyAndUID() {
   uint8_t uid[7];
   uint8_t uidLength;
@@ -164,14 +165,14 @@ void readKeyAndUID() {
       uint8_t uidData[16];
 
       if (nfc.mifareclassic_ReadDataBlock(4, keyData) && nfc.mifareclassic_ReadDataBlock(5, uidData)) {
-        // Вывод ключа
+        // Key output
         Serial.print("Encrypted Key (ASCII): ");
         for (int i = 0; i < 16; i++) {
           Serial.print((char)keyData[i]);
         }
         Serial.println();
 
-        // Вывод записанного UID
+        // UID output
         String storedUID = "";
         for (int i = 0; i < 16; i++) {
           if (uidData[i] != 0) storedUID += (char)uidData[i];
@@ -179,7 +180,7 @@ void readKeyAndUID() {
         Serial.print("Stored UID: ");
         Serial.println(storedUID);
 
-        // Проверка, есть ли storedUID в массиве допустимых
+        // Check if stored UID is in valid array
         bool accessGranted = false;
         for (int i = 0; i < allowedCount; i++) {
           if (storedUID == allowedUIDs[i]) {
@@ -188,6 +189,7 @@ void readKeyAndUID() {
           }
         }
 
+        // if stored UID - valid - relay is open, else - relay is close, default relay is close all time
         if (accessGranted) {
           Serial.println("✅ Access granted!");
           digitalWrite(RELAY_PIN, HIGH);

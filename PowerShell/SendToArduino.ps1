@@ -16,16 +16,19 @@ if (-not $Key -or $Key.Length -ne 16) {
 }
 
 try {
+    # Opening COM port
     $port = New-Object System.IO.Ports.SerialPort "COM9", 9600, 'None', 8, 'One'
     $port.ReadTimeout = 500  # 0.5 second timeout for faster reaction
     $port.Open()
 
     Start-Sleep -Milliseconds 10000
 
+    # Sending command on Arduino 
     $port.WriteLine("1")
     Add-Content $logFile "✅ Sent WRITE command (1)."
     Start-Sleep -Milliseconds 1000
 
+    # Sending identification code on Arduino to writing on students card
     $port.WriteLine($Key)
     Add-Content $logFile "✅ Key sent: $Key"
     Write-Host "✅ Key sent to Arduino. Listening for responses..."
