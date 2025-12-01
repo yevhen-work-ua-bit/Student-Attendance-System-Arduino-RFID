@@ -52,14 +52,12 @@ The data is then sent to the PC, where an Access database automatically processe
 - Tables:
   - Students
   - AttendanceLog
-  - EncryptedKeys
 
 ---
 
 ## 🔐 Security Notes
 
-- No personal student data is included in this repository  
-- Access database contains only **empty template tables**
+- All students in this database is fake, no personal data  
 - Encryption keys in examples are **placeholders**
 
 ---
@@ -71,5 +69,5 @@ The data is then sent to the PC, where an Access database automatically processe
 - Replace serial COM monitoring with a network API  
 - Add biometric verification as a mandatory step  
 - Build PCB for the entire device  
-- Integrate ESP32 for Wi-Fi connection  
+- Integrate ESP32 for Wi-Fi connection 
 
