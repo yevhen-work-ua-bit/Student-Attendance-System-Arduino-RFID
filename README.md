@@ -22,16 +22,16 @@ The data is then sent to the PC, where an Access database automatically processe
 ---
 
 # 🧩 System Architecture
-[Student]
-↓ (NFC tag / phone)
-[PN532 → Arduino]
-↓ (UID check)
+[Student] 
+→  (NFC tag / phone)
+[PN532 → Arduino] 
+→  (UID check)
 [Door Unlock]
-↓ (Send encrypted key)
+→  (Send encrypted key) 
 [PowerShell Listener]
-↓ (Incoming_keys.txt)
+→  (Incoming_keys.txt) 
 [MS Access VBA]
-↓ (Student identification)
+→  (Student identification) 
 [AttendanceLog table]
 
 ## 🛠 Technologies Used
