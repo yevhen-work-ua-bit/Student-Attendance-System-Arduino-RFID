@@ -8,7 +8,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
-' В САМОМ ВЕРХУ модуля:
+
 #If VBA7 Then
     Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As LongPtr)
 #Else
@@ -20,7 +20,7 @@ Private Sub btnAddStudent_Click()
     Dim symbols As String
     Dim i As Integer
     
-    ' Генерация 16-символьного ключа
+    ' Generation 16-bit identification key
     symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     Randomize
     Key = ""
@@ -28,19 +28,19 @@ Private Sub btnAddStudent_Click()
         Key = Key & Mid(symbols, Int((Len(symbols) * Rnd) + 1), 1)
     Next i
     
-    ' Добавляем запись в таблицу Students
+    ' Add student on database Students
     CurrentDb.Execute "INSERT INTO Students (FirstName, LastName, Course, Specialty, StudentKey) " & _
                       "VALUES ('" & Me.FirstName & "', '" & Me.txtLastName & "', '" & Me.txtCourse & "', '" & Me.txtSpecialty & "', '" & Key & "')"
     
     MsgBox "Student added successfully!" & vbCrLf & "Key: " & Key, vbInformation
     
-    ' Очищаем поля ввода
+    ' Cleaning
     Me.FirstName = ""
     Me.txtLastName = ""
     Me.txtCourse = ""
     Me.txtSpecialty = ""
     
-    ' Записываем ключ в текстовое поле для отправки на Arduino
+    ' Prepairing identitfication key to sending to arduino
     Me.txtStudentKey = Key
 End Sub
 
@@ -58,12 +58,12 @@ Private Sub btnSendToArduino_Click()
         MsgBox "Ключ должен быть 16 символов!", vbExclamation
         Exit Sub
     End If
-    ' Команда запуска PowerShell с передачей ключа
+    ' Starting a PowerShell script SendToArduino & sending key
     psCommand = "powershell -ExecutionPolicy Bypass -File ""E:\GitHub\Student-Attendance-System-Arduino-RFID\PowerShell\SendToArduino.ps1"" -Key """ & Key & """"
     
     result = shell(psCommand, vbHide)
 
-    MsgBox "Ключ отправлен на Arduino!", vbInformation
+    MsgBox "The key was sent to the Arduino successfully!", vbInformation
 End Sub
 
 Private Sub Form_Current()

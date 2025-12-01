@@ -15,7 +15,7 @@ Dim lastLineIndex As Long
 Private Sub Form_Load()
     lastLineIndex = 1
 
-    ' Запуск PowerShell скрипта в скрытом режиме
+    ' Starting PowerShell script on a hide mode
     Dim cmd As String
     cmd = "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File ""E:\GitHub\Student-Attendance-System-Arduino-RFID\PowerShell\MonitorArduino.ps1"""
     shell cmd, vbHide
@@ -37,9 +37,9 @@ Private Sub Form_Timer()
         fileLines = Split(ts.ReadAll, vbCrLf)
         ts.Close
 
-        Debug.Print "? Индекс чтения (до): " & lastLineIndex
+        Debug.Print "? Index of reading (lines)(before): " & lastLineIndex
 
-        ' Если файл полностью пустой — сбросить индекс
+        ' If file is empty - index = 0
         If UBound(fileLines) = 0 And Trim(fileLines(0)) = "" Then
             lastLineIndex = 0
             Debug.Print "? Файл пуст. Индекс сброшен до 0."
@@ -58,19 +58,19 @@ Private Sub Form_Timer()
                     lastLineIndex = lastLineIndex + 1
                 Else
                     Debug.Print "? Пропущена пустая строка на позиции: " & i
-                    ' Не увеличиваем индекс
+                    ' If line is empty - index does not chage
                 End If
             Next i
         End If
 
-        Debug.Print "? Индекс чтения (после): " & lastLineIndex
+        Debug.Print "? Index of reading (lines) (after): " & lastLineIndex
     Else
-        Debug.Print "? Файл не найден: " & filePath
+        Debug.Print "? File not found: " & filePath
     End If
 End Sub
 
 
-
+' Insert attendance in database
 Private Sub InsertAttendance(StudentKey As String)
     Dim sql As String
     Dim rs As DAO.Recordset
@@ -89,9 +89,9 @@ Private Sub InsertAttendance(StudentKey As String)
               "'" & rs!Course & "')"
 
         CurrentDb.Execute sql
-        Debug.Print "? Посещение добавлено: " & StudentKey
+        Debug.Print "? Visit added: " & StudentKey
     Else
-        Debug.Print "? Студент не найден: " & StudentKey
+        Debug.Print "? Student not found: " & StudentKey
     End If
 
     rs.Close
